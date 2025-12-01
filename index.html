@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Liver VisiumHD Data</title>
+  <link rel="stylesheet" href="css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<header>
+  <h1>Liver VisiumHD Data Exploration Tools</h1>
+  <p>Explore liver spatial transcriptomics data through interactive Shiny apps, the Loupe Browser or download raw data for analysis.</p>
+</header>
+
+<main>
+  
+  <section>
+    <h2>Interactive Shiny Apps</h2>
+    <div class="card-container">
+      <div class="card">
+        <h3>Region of interest with 8um bins</h3>
+        <img src="images/shiny8um.png" alt="HLiCA Dataset">
+        <a href="https://macparlandlab.shinyapps.io/liver_VisiumHD_8um/" target="_blank">Launch App</a>
+      </div>
+
+      <div class="card">
+        <h3>Region of interest with 2um bins</h3>
+        <img src="images/shiny2um.png" alt="HLiCA Dataset">
+        <a href="https://macparlandlab.shinyapps.io/liver_VisiumHD_2um/" target="_blank">Launch App</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Data Deposits</h2>
+    <p>As the Shiny apps linked above only show select regions of interest we have provided all data below. For viewing the bin annotation and expression interactively we would recommend downloading the Loupe Browser file and viewing in the  <a href="https://www.10xgenomics.com/support/software/loupe-browser/latest" target="_blank">Loupe Browser</a>. For a reanalysis of all samples, we have provided Space Ranger outputs as well as FASTQ files. </p>
+    <div class="card-container">
+      <div class="card">
+        <h3>Raw Data</h3>
+        <p>Output of Space Ranger for all samples</p>
+        <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=XXXX" target="_blank">View Dataset</a>
+      </div>
+
+      <div class="card">
+        <h3>Images Files</h3>
+        <p>High-resolution H&E images</p>
+        <a href="https://doi.org/XXXX" target="_blank">View Dataset</a>
+      </div>
+
+      <div class="card">
+        <h3>Loupe Browser Files</h3>
+        <p>For interactively viewing the whole tissue but only at 8um</p>
+        <a href="https://www.synapse.org/XXXX" target="_blank">View Dataset</a>
+      </div>
+
+      <div class="card">
+        <h3>8um bin Annotation</h3>
+        <p>Annotation at 8um bins</p>
+        <a href="https://www.synapse.org/XXXX" target="_blank">View Dataset</a>
+      </div>
+      
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>Rachel Edgar &mdash; <a href="mailto:r.edgar@utoronto.ca">Contact</a></p>
+</footer>
+
+</body>
+</html>
