@@ -807,6 +807,53 @@ celltype<-ggplot(lumen_summary_adjacent_expanded_plot[which(lumen_summary_adjace
 save_plts(celltype, "celltype_around_lumen", w=6, h=4)
 
 
+##### do a statistic on that but keeping the percentages per lumen, Still like the bar plot to summarize overall 
+
+lumen_summary_adjacent_per_lumen <- adjacent_bins %>%
+  group_by(lumen_adjacent, lumen_type, final_anno) %>%
+  summarise(n = n(), .groups = "drop_last") %>%
+  mutate(percentage = 100 * n / sum(n)) %>%
+  ungroup()
+lumen_summary_adjacent_per_lumen$area<-"adjacent"
+colnames(lumen_summary_adjacent_per_lumen)[1]<-"lumen_ID"
+
+
+lumen_summary_expanded_per_lumen <- expanded_bins %>%
+  group_by(lumen_expanded, lumen_type, final_anno) %>%
+  summarise(n = n(), .groups = "drop_last") %>%
+  mutate(percentage = 100 * n / sum(n)) %>%
+  ungroup()
+lumen_summary_expanded_per_lumen$area<-"expanded"
+colnames(lumen_summary_expanded_per_lumen)[1]<-"lumen_ID"
+
+lumen_summary_adjacent_expanded_plot_perlumen<-rbind(lumen_summary_adjacent_per_lumen, lumen_summary_expanded_per_lumen)
+
+lumen_summary_adjacent_expanded_plot_perlumen$area_size<-as.factor(paste(lumen_summary_adjacent_expanded_plot_perlumen$area, lumen_summary_adjacent_expanded_plot_perlumen$lumen_type))
+levels(lumen_summary_adjacent_expanded_plot_perlumen$area_size)<-c("Large\nlumen\nadjacent","Small\nlumen\nadjacent","Large\nlumen\nproximal","Small\nlumen\nproximal")
+
+
+ggplot(lumen_summary_adjacent_expanded_plot_perlumen[which(lumen_summary_adjacent_expanded_plot_perlumen$final_anno%in%c("hepatic stellate cell","fibroblast")),], 
+       aes(area_size, percentage, fill=area_size))+
+  geom_boxplot(color="black")+
+  facet_wrap(~final_anno)+ xlab("Proximity to lumen")+ylab("Percent of bins annotated as cell type")+
+  scale_fill_manual(values=c("#184E77","#6a9942","#93b5cf","#B5E48C"))+theme_bw()+
+  theme(legend.position = "none")
+
+
+
+Fibro<-lumen_summary_adjacent_expanded_plot_perlumen[which(lumen_summary_adjacent_expanded_plot_perlumen$final_anno=="fibroblast"),]
+
+model <- lm(percentage ~ lumen_type * area, data = Fibro)
+anova(model)
+
+#Fibroblast and hepatic stellate cell abundance significantly varied by proximity to the lumen (adjacent vs proximal; two-way ANOVA, p<0.05), but was not significantly dependent on lumen size (large vs small)
+
+HSC<-lumen_summary_adjacent_expanded_plot_perlumen[which(lumen_summary_adjacent_expanded_plot_perlumen$final_anno=="hepatic stellate cell"),]
+model <- lm(percentage ~ lumen_type * area, data = HSC)
+anova(model)
+
+
+
 #### bar plot of types
 bin_count$lumen_type <- "small lumen"
 bin_count$lumen_type[which(bin_count$Freq>100)]<-"large lumen"
