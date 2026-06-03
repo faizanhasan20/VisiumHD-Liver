@@ -122,3 +122,31 @@ plot_gene_foldchange("MUC6",zone_markers) # not on protein atlas
 
 fc_plot<-plot_grid(plot_gene_foldchange("SLCO1B3",zone_markers), plot_gene_foldchange("LGALS4",zone_markers), ncol=1)
 save_plts(fc_plot, "gene_fold_change", w=4, h=6)
+
+
+## something that is on xenium so can show validation in C95
+
+xenium<-read.csv("../xenium_liver/data/Xenium_CombinedPanel.csv")
+
+
+xenium$Gene[which(xenium$Gene%in%c("HAL","SDS","CPS1","HMGCS1","CYP2A6"))]
+xenium$Gene[grep("portal",xenium$X)]
+xenium$Gene[grep("CYP",xenium$Gene)]
+
+lapply(xenium$Gene[grep("CYP",xenium$Gene)], function(gene) plot_gene_foldchange(gene,zone_markers) )
+lapply(xenium$Gene[grep("portal",xenium$X)], function(gene) plot_gene_foldchange(gene,zone_markers) )
+
+
+## PV - but not on xenium
+plot_gene_foldchange("HAL",zone_markers)
+
+##CV - all on xenium
+plot_gene_foldchange("CYP3A4",zone_markers) # stain ok
+plot_gene_foldchange("CYP2E1",zone_markers) #great staining
+plot_gene_foldchange("CYP1A2",zone_markers) #great staining
+plot_gene_foldchange("CYP1A1",zone_markers) # minimal staining available
+
+
+
+fc_plot<-plot_grid(plot_gene_foldchange("HAL",zone_markers), plot_gene_foldchange("CYP1A2",zone_markers), ncol=1)
+save_plts(fc_plot, "gene_fold_change_revision", w=4, h=6)
