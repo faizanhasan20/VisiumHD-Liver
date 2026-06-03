@@ -368,28 +368,35 @@ metrcis
 save_plts(metrcis, "metrics_allsamples_option2", w=3.5, h=7)
 
 
+
 metrcis<-plot_grid(
   ggplot(df_summary, aes(bin, n_rows, fill=sample))+
-    geom_bar(stat="identity", color="black")+
+    geom_bar(stat="identity", color="black",position="dodge")+
+    geom_text(aes(label = ifelse(n_rows < 1000000, label_number(scale = 1e-3, suffix = "K", big.mark = ",", accuracy = 1)(n_rows), "")),position = position_dodge(width = 1),vjust = -0.2,hjust = -0.2,angle = 45,size = 2.5, color="grey60")+
     scale_y_continuous(labels = label_number(accuracy = 0.1, scale_cut = cut_si(""))) +
-    scale_fill_manual(values=c("#023047","#219ebc","#8ecae6"))+
+    scale_fill_manual(values=c("#669bbc","#588157","#edafb8"))+
     theme_bw()+  theme(strip.background = element_rect(fill="white"),
-                       legend.position = "none")+
-    ylab("Number Bins")+xlab("Bin size (µm)"),
+                       axis.text.x = element_blank(),
+                       axis.title.x = element_blank(),
+                       axis.ticks.x = element_blank())+
+    ylab("Number of Bins")+xlab("Bin size (µm)"),
   
   ggplot(df_summary, aes(bin, median_nFeature, fill=sample))+
-    geom_bar(stat="identity", color="black")+
-    scale_fill_manual(values=c("#023047","#219ebc","#8ecae6"))+
-    theme_bw()+  theme(strip.background = element_rect(fill="white"),
-                       legend.position = "none")+
-    ylab("Median Number of\nGenes in a Bin")+xlab("Bin size (µm)"),
+    geom_bar(stat="identity", color="black",position="dodge")+
+    geom_text(aes(label = ifelse(median_nFeature < 100, label_number(big.mark = ",")(median_nFeature), "")),position = position_dodge(width = 1),vjust = -0.2,hjust = -0.2,angle = 45,size = 2.5, color="grey60")+
+    scale_fill_manual(values=c("#669bbc","#588157","#edafb8"))+
+    theme_bw()+  theme(strip.background = element_rect(fill="white"), 
+                       axis.text.x = element_blank(),
+                       axis.title.x = element_blank(),
+                       axis.ticks.x = element_blank())+
+    ylab("Genes\n(median per bin)")+xlab("Bin size (µm)"),
   
   ggplot(df_summary, aes(bin, median_nCount, fill=sample))+
-    geom_bar(stat="identity", color="black")+
-    scale_fill_manual(values=c("#023047","#219ebc","#8ecae6"))+
-    theme_bw()+  theme(strip.background = element_rect(fill="white"),
-                       legend.position = "none")+
-    ylab("Median Number of\nTranscripts in a Bin")+xlab("Bin size (µm)"),
+    geom_bar(stat="identity", color="black",position="dodge")+
+    geom_text(aes(label = ifelse(median_nCount < 250, label_number(big.mark = ",")(median_nCount), "")),position = position_dodge(width = 1),vjust = -0.2,hjust = -0.2,angle = 45,size = 2.5, color="grey60")+
+    scale_fill_manual(values=c("#669bbc","#588157","#edafb8"))+
+    theme_bw()+  theme(strip.background = element_rect(fill="white"))+
+    ylab("Transcripts\n(median per bin)")+xlab("Bin size (µm)"),
   ncol=1, align="v")
 metrcis
 
