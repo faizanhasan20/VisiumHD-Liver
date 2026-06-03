@@ -270,7 +270,81 @@ aling_views_ducts<-plot_grid(plot_bins, ducts, ncol=1, align="v")
 aling_views_ducts
 save_plts(aling_views_ducts, "C107_small_large_ducts", w=8, h=8)
 
+                    
 
+######################
+## how does that translate to mean diameter?
+######################
+
+annotation_C107_8um<-read.csv(here("data/annotation_C107_8um_additional.csv"))
+
+localdir <- "/media/redgar/Seagate Portable Drive/visiumHD_liver/reseq/MacParland_Diana__C107_D1/outs"
+object <- Load10X_Spatial(data.dir = localdir, bin.size = c(8))
+
+head(object)
+
+rownames(annotation_C107_8um)<-annotation_C107_8um$bin
+annotation_C107_8um<-annotation_C107_8um[match(colnames(object), rownames(annotation_C107_8um)),]
+identical(colnames(object),annotation_C107_8um$bin)
+
+object<-AddMetaData(object,annotation_C107_8um)
+
+cholangiocyte_bins<-subset(object, subset = final_anno == "intrahepatic cholangiocyte")
+
+
+### resize the ducts
+bin_count <- table(cholangiocyte_bins$bile_duct_cluster)
+
+cholangiocyte_bins$bile_duct_size <- sapply(cholangiocyte_bins$bile_duct_cluster, function(cluster) {
+  bin_num <- bin_count[as.character(cluster)]
+  if (bin_num <= 2) {
+    return("technical artifact")
+  } else if (bin_num < 20) {
+    return("small duct")
+  } else if (bin_num >= 20) {
+    return("large duct")
+  }
+})
+
+
+## how does that translate to mean diameter?
+chol_coords <- as.data.frame(cholangiocyte_bins@images$slice1$centroids@coords)
+rownames(chol_coords)<-colnames(cholangiocyte_bins)
+
+# plot bile ducts annotated by size
+chol_coords$bin<-rownames(chol_coords)
+plt_cholangiocyte_spatial<-merge(chol_coords,cholangiocyte_bins@meta.data, by="bin")
+
+## only ducts with more than 3 - for those less assign 16um since it will be two bins max
+hulls <- plt_cholangiocyte_spatial %>%
+  group_by(bile_duct_cluster, bile_duct_size) %>%
+  filter(n() >= 3) %>%  slice(chull(x, y)) %>%  ungroup()
+
+hull_diameters <- hulls %>%  group_by(bile_duct_cluster,bile_duct_size) %>%
+  summarise(diameter = if(n() > 1) max(dist(cbind(x, y))) else NA_real_,.groups = "drop")
+
+plt_cholangiocyte_spatial<-merge(plt_cholangiocyte_spatial, hull_diameters[,c("bile_duct_cluster","diameter")], by="bile_duct_cluster", all.x=T)
+
+## duct 86 is a square and the diameter is 19.02984 but should be 16 since it is 8um bins
+#So scale all diameters by this factor
+16/19.02984
+plt_cholangiocyte_spatial$diameter_adjusted<-plt_cholangiocyte_spatial$diameter*(16/19.02984)
+
+## add back in ducts with only 2-3 bins (diameter = 16)
+#2 bins
+bins2<-names(bin_count[which(bin_count<3 & bin_count>1)])
+plt_cholangiocyte_spatial$diameter_adjusted[which(plt_cholangiocyte_spatial$bile_duct_cluster%in%bins2)]<-16
+
+mean_diameter_by_size <- plt_cholangiocyte_spatial %>%
+  group_by(bile_duct_size) %>%
+  summarise(min_diameter = min(diameter_adjusted, na.rm = TRUE),
+            mean_diameter = mean(diameter_adjusted, na.rm = TRUE),
+            max_diameter = max(diameter_adjusted, na.rm = TRUE),
+            n = n(),.groups = "drop")
+mean_diameter_by_size
+
+
+                      
 #############
 ## DEG between cholangiocyte types
 #############
